@@ -60,9 +60,6 @@
 #include <cartesian_pointing_interfaces/srv/point_at.hpp>
 #include <cartesian_pointing_interfaces/srv/is_motion_done.hpp>
 
-// BlackBoard Interfaces
-#include <blackboard_interfaces/srv/set_all_ints_with_prefix_blackboard.hpp>
-
 // ExecuteAudio Interfaces
 #include <execute_audio_interfaces/srv/execute_audio.hpp>
 
@@ -258,9 +255,6 @@ private:
 
     std::shared_ptr<rclcpp::Node> isMotionDoneClientNode;
     std::shared_ptr<rclcpp::Client<cartesian_pointing_interfaces::srv::IsMotionDone>> isMotionDoneClient;
-
-    std::shared_ptr<rclcpp::Node> blackBoardResetClientNode;
-    std::shared_ptr<rclcpp::Client<blackboard_interfaces::srv::SetAllIntsWithPrefixBlackboard>> blackBoardResetClient;
 
     std::shared_ptr<rclcpp::Node> executeAudioClientNode;
     std::shared_ptr<rclcpp::Client<execute_audio_interfaces::srv::ExecuteAudio>> executeAudioClient;

@@ -63,10 +63,10 @@ bool DialogComponent::ConfigureYARP(yarp::os::ResourceFinder &rf)
     {
         okCheck = rf.check("CONTEXTMANAGERCHAT-CLIENT");
         device = "LLM_nwc_yarp";
-        std::string prompt_start_file = "Format_commands_welcome_prompt.txt";
+        std::string prompt_start_file = "context_manager_prompt.txt";
         local = "/DialogComponent/chatBotClient/rpc:o";
         // remote = "/poi_chat/LLM_nws/rpc:i";
-        remote = "/welcome_chat/LLM_nws/rpc:i";
+        remote = "/context_manager_chat/LLM_nws/rpc:i";
 
         if (okCheck)
         {
@@ -111,7 +111,7 @@ bool DialogComponent::ConfigureYARP(yarp::os::ResourceFinder &rf)
         okCheck = rf.check("CRISCHAT-CLIENT");
         device = "LLM_nwc_yarp";
         local = "/DialogComponent/crisConvClient/rpc:o";
-        remote = "/madama_chat/LLM_nws/rpc:i";
+        remote = "/cris_chat/LLM_nws/rpc:i";
 
         if (okCheck)
         {
@@ -348,9 +348,6 @@ bool DialogComponent::start(int argc, char *argv[])
 
     // schedulerEndTourClientNode = rclcpp::Node::make_shared("DialogComponentSchedulerEndTourNode");
     // schedulerEndTourClient = schedulerEndTourClientNode->create_client<scheduler_interfaces::srv::EndTour>("/SchedulerComponent/EndTour");
-
-    blackBoardResetClientNode = rclcpp::Node::make_shared("DialogComponentBlackBoardResetNode");
-    blackBoardResetClient = blackBoardResetClientNode->create_client<blackboard_interfaces::srv::SetAllIntsWithPrefixBlackboard>("/BlackboardComponent/SetAllIntsWithPrefix");
 
     executeAudioClientNode = rclcpp::Node::make_shared("DialogComponentExecuteAudioNode");
     executeAudioClient = executeAudioClientNode->create_client<execute_audio_interfaces::srv::ExecuteAudio>("/ExecuteAudioComponent/ExecuteAudio");
@@ -1594,7 +1591,7 @@ void DialogComponent::ResetState(const std::shared_ptr<dialog_interfaces::srv::R
     yInfo() << "[DialogComponent::ResetState] Resetting the state of interactions and llms" << __LINE__;
 
     // delete conversation history of all the chatbots
-    m_iPoiChat->deleteConversation();
+    m_iPoiChat->refreshConversation();
     m_iGenericChat->refreshConversation();
     m_iMuseumChat->refreshConversation();
 
