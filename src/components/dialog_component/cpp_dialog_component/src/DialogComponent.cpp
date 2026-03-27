@@ -104,35 +104,7 @@ bool DialogComponent::ConfigureYARP(yarp::os::ResourceFinder &rf)
             return false;
         }
 
-        yarp::os::ResourceFinder resource_finder;
-        resource_finder.setDefaultContext(prompt_context);
-        std::string prompt_file_fullpath = resource_finder.findFile(prompt_poi_file);
-        yInfo() << "Prompt file full path: " << prompt_file_fullpath;
-        auto stream = std::ifstream(prompt_file_fullpath);
-        if (!stream)
-        {
-            yWarning() << "File:" << prompt_file_fullpath << "does not exist or path is invalid";
-        }
-        else
-        {
-            std::ostringstream sstr;
-            sstr << stream.rdbuf(); // Reads the entire file into the stringstream
-            m_poiPrompt = sstr.str();
-        }
-        resource_finder.setDefaultContext(prompt_context);
-        prompt_file_fullpath = resource_finder.findFile(prompt_start_file);
-        yInfo() << "Start Prompt file full path: " << prompt_file_fullpath;
-        stream = std::ifstream(prompt_file_fullpath);
-        if (!stream)
-        {
-            yWarning() << "File:" << prompt_file_fullpath << "does not exist or path is invalid";
-        }
-        else
-        {
-            std::ostringstream sstr;
-            sstr << stream.rdbuf(); // Reads the entire file into the stringstream
-            m_startPrompt = sstr.str();
-        }
+        
     }
     // -------------------------Cris llm nwc---------------------------------
     {
@@ -585,63 +557,20 @@ bool DialogComponent::CommandManager(const std::string &command, std::shared_ptr
     m_last_reveived_interaction_language = newLang;
     response->dance = dance;
 
-    // Get the poi object from the Tour manager
-    PoI currentPoI;
-    if (!m_tourStorage->GetTour().getPoI(m_currentPoiName, newLang, currentPoI))
-    {
-        yError() << "[DialogComponent::CommandManager] Unable to get the current PoI for " << m_currentPoiName;
-        return false;
-    }
-    // Generic PoI
-    PoI genericPoI;
-    if (!m_tourStorage->GetTour().getPoI("___generic___", newLang, genericPoI))
-    {
-        yError() << "[DialogComponent::CommandManager] Unable to get the generic PoI";
-        return false;
-    }
-
-    // Let's check what to do with the action
-    if (action == "exp_f")
-    {
-        response->context = "explainFunction";
-        response->is_ok = true;
-    }
-    else if (action == "exp_d")
-    {
-        response->context = "explainDescription";
-        response->is_ok = true;
-    }
-    else if (action == "museum")
+    else if (action == "cris")
     {
         response->is_ok = true;
-        response->context = "museum";
+        response->context = "cris";
     }
     else if (action == "general")
     {
         response->is_ok = true;
         response->context = "general";
     }
-    else if (action == "next_poi" || action == "start_tour") // means that it has been found // NEXT POI
+    else if (action == "end_chat") // means that it has been found // NEXT POI
     {
 
-        // if (action == "start_tour") {
-        //     auto msgInteraction  = dialog_interfaces::msg::VerbalInteraction();
-        //     msgInteraction.text = m_last_received_interaction;
-        //     msgInteraction.id = interactionCounter++;
-        //     msgInteraction.confidence = confidence;
-        //     m_interactionPublisher->publish(msgInteraction);
-        // }
-
-        yInfo() << "[DialogComponent::CommandManager] Next Poi Detected" << __LINE__;
-
-        response->is_ok = true;
-        response->is_poi_ended = true;
-    }
-    else if (action == "end_tour") // END TOUR
-    {
-        yInfo() << "[DialogComponent::CommandManager] End Tour Detected" << __LINE__;
-        ResetTourAndFlags();
-        // delete conversation history of all the chatbots
+        yInfo() << "[DialogComponent::CommandManager] End Chat Detected" << __LINE__;
 
         response->is_ok = true;
         response->is_poi_ended = true;

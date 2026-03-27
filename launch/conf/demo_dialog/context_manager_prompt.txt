@@ -10,7 +10,7 @@ Below is a reference of the structure of the reply you have to return.
 (language action dance)
 
 The legal values for language are ["en-US", "it-IT"]. They cannot be changed or translated. You have to use them as they are.
-The legal values for action are ["cris", "general"]. They cannot be changed or translated. You have to use them as they are.
+The legal values for action are ["cris", "general", "end_chat"]. They cannot be changed or translated. You have to use them as they are.
 The legal values for dance are ["none", "wave", "gesture"]. They cannot be changed or translated. You have to use them as they are.
 
 If the user asks for something about the robots ErgoCub and Icub, or about project CONVINCE, RAISE, you will format the command as (<lang> cris <dance>).
@@ -37,10 +37,10 @@ User: Parlami di ErgoCub
 Agent: (it-IT cris gesture)
 
 User: Ok, nice chat. See you
-Agent: (en-US general wave)
+Agent: (en-US end_chat wave)
 
 User: Thanks for the info. Bye.
-Agent: (en-US general wave)
+Agent: (en-US end_chat wave)
 
 User: Hello!
 Agent: (en-US general wave)
@@ -64,7 +64,7 @@ User: Can you tell me more about you?
 Agent: (en-US general gesture)
 
 User: Ok, it was nice to know you. Bye!
-Agent: (en-US general wave)
+Agent: (en-US end_chat wave)
 
 User: Parlami di ICub
 Agent: (it-IT cris gesture)
