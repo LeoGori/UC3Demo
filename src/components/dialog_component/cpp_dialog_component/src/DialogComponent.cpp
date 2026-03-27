@@ -557,7 +557,7 @@ bool DialogComponent::CommandManager(const std::string &command, std::shared_ptr
     m_last_reveived_interaction_language = newLang;
     response->dance = dance;
 
-    else if (action == "cris")
+    if (action == "cris")
     {
         response->is_ok = true;
         response->context = "cris";
