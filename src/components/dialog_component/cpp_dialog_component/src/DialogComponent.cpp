@@ -61,10 +61,8 @@ bool DialogComponent::ConfigureYARP(yarp::os::ResourceFinder &rf)
     std::string device, local, remote;
     // -------------------------Chat LLM nwc---------------------------------
     {
-        okCheck = rf.check("POICHAT-CLIENT");
+        okCheck = rf.check("CONTEXTMANAGERCHAT-CLIENT");
         device = "LLM_nwc_yarp";
-        std::string prompt_context = "convince";
-        std::string prompt_poi_file = "poi_madama_prompt.txt";
         std::string prompt_start_file = "Format_commands_welcome_prompt.txt";
         local = "/DialogComponent/chatBotClient/rpc:o";
         // remote = "/poi_chat/LLM_nws/rpc:i";
@@ -72,16 +70,7 @@ bool DialogComponent::ConfigureYARP(yarp::os::ResourceFinder &rf)
 
         if (okCheck)
         {
-            yarp::os::Searchable &chatBot_config = rf.findGroup("POICHAT-CLIENT");
-            // Why are these two lines repeated?
-            if (chatBot_config.check("prompt-context"))
-            {
-                prompt_context = chatBot_config.find("prompt-context").asString();
-            }
-            if (chatBot_config.check("prompt-poi-file"))
-            {
-                prompt_poi_file = chatBot_config.find("prompt-poi-file").asString();
-            }
+            yarp::os::Searchable &chatBot_config = rf.findGroup("CONTEXTMANAGERCHAT-CLIENT");
 
             if (chatBot_config.check("device"))
             {
@@ -145,16 +134,16 @@ bool DialogComponent::ConfigureYARP(yarp::os::ResourceFinder &rf)
             m_startPrompt = sstr.str();
         }
     }
-    // -------------------------Museum llm nwc---------------------------------
+    // -------------------------Cris llm nwc---------------------------------
     {
-        okCheck = rf.check("MUSEUMCHAT-CLIENT");
+        okCheck = rf.check("CRISCHAT-CLIENT");
         device = "LLM_nwc_yarp";
-        local = "/DialogComponent/museumConvClient/rpc:o";
+        local = "/DialogComponent/crisConvClient/rpc:o";
         remote = "/madama_chat/LLM_nws/rpc:i";
 
         if (okCheck)
         {
-            yarp::os::Searchable &llm_config = rf.findGroup("MUSEUMCHAT-CLIENT");
+            yarp::os::Searchable &llm_config = rf.findGroup("CRISCHAT-CLIENT");
             if (llm_config.check("device"))
             {
                 device = llm_config.find("device").asString();
@@ -187,16 +176,16 @@ bool DialogComponent::ConfigureYARP(yarp::os::ResourceFinder &rf)
             return false;
         }
     }
-    // -------------------------Generic llm nwc---------------------------------
+    // -------------------------R1 llm nwc---------------------------------
     {
-        okCheck = rf.check("GENERICCHAT-CLIENT");
+        okCheck = rf.check("R1CHAT-CLIENT");
         device = "LLM_nwc_yarp";
-        local = "/DialogComponent/genericConvClient/rpc:o";
-        remote = "/welcome_talk_chat/LLM_nws/rpc:i";
+        local = "/DialogComponent/r1ConvClient/rpc:o";
+        remote = "/r1_chat/LLM_nws/rpc:i";
 
         if (okCheck)
         {
-            yarp::os::Searchable &llm_config = rf.findGroup("GENERICCHAT-CLIENT");
+            yarp::os::Searchable &llm_config = rf.findGroup("R1CHAT-CLIENT");
             if (llm_config.check("device"))
             {
                 device = llm_config.find("device").asString();
