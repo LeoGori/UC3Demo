@@ -52,13 +52,6 @@
 #include <text_to_speech_interfaces/srv/set_microphone.hpp>
 #include <text_to_speech_interfaces/srv/is_speaking.hpp>
 
-// Scheduler Interfaces
-#include <scheduler_interfaces/srv/get_current_poi.hpp>
-#include <scheduler_interfaces/srv/end_tour.hpp>
-#include <scheduler_interfaces/srv/update_poi.hpp>
-#include <scheduler_interfaces/srv/set_language.hpp>
-#include <scheduler_interfaces/srv/end_tour.hpp>
-
 // ExecuteDance Interfaces
 #include <execute_dance_interfaces/srv/execute_dance.hpp>
 #include <execute_dance_interfaces/srv/reset_dance.hpp>
@@ -137,12 +130,10 @@ protected:
     void WaitForSpeakEnd(); // ROS2 service client to TextToSpeechComponent to get if the TTS is speaking. Wait until it is not
     bool WaitForSpeakStart(); // ROS2 service client to TextToSpeechComponent to get if the TTS is speaking. Return True when it starts speaking, False if timeout
     void WaitForPointingEnd(); // ROS2 service client to CartesianPointingComponent to get if the robot is pointing. Wait until it stops
-    bool UpdatePoILLMPrompt(); // Updates the prompt of the PoIChat LLM based on the current PoI. Leverages the SchedulerComponent service to get the current PoI name
     void ExecuteDance(std::string danceName, float estimatedSpeechTime); // ROS2 service client to ExecuteDanceComponent to execute the dance with the given name
     void ResetDance(); // ROS2 service client to ResetDanceComponent to reset the dance with the given name
     void ExecutePointing(std::string pointingTarget); // ROS2 service client to CartesianPointingComponent to point at the given target
     void SetFaceExpression(std::string expressionName); // ROS2 service client to FaceExpressionComponent to set the face expression with the given name
-    void ResetTourAndFlags(); // Resets the tour in the SchedulerComponent and in the BlackBoardComponent
     void ExecuteAudio(std::string audioName); // forwards call to execute_audio_component
     void DisableMicrophone();
 

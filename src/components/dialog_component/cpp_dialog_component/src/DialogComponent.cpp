@@ -355,11 +355,11 @@ bool DialogComponent::start(int argc, char *argv[])
 
     m_interactionPublisher = m_node->create_publisher<dialog_interfaces::msg::VerbalInteraction>("/DialogComponent/interaction", 10);
 
-    nodeGetCurrentPoi = rclcpp::Node::make_shared("DialogComponentNodeGetCurrentPoi");
-    clientGetCurrentPoi = nodeGetCurrentPoi->create_client<scheduler_interfaces::srv::GetCurrentPoi>("/SchedulerComponent/GetCurrentPoi");
+    // nodeGetCurrentPoi = rclcpp::Node::make_shared("DialogComponentNodeGetCurrentPoi");
+    // clientGetCurrentPoi = nodeGetCurrentPoi->create_client<scheduler_interfaces::srv::GetCurrentPoi>("/SchedulerComponent/GetCurrentPoi");
 
-    setLangClientNode = rclcpp::Node::make_shared("DialogComponentSetLangNode");
-    setLangClient = setLangClientNode->create_client<scheduler_interfaces::srv::SetLanguage>("/SchedulerComponent/SetLanguage");
+    // setLangClientNode = rclcpp::Node::make_shared("DialogComponentSetLangNode");
+    // setLangClient = setLangClientNode->create_client<scheduler_interfaces::srv::SetLanguage>("/SchedulerComponent/SetLanguage");
 
     setLangClientNode2 = rclcpp::Node::make_shared("DialogComponentSetLangNode2");
     setLangClient2 = setLangClientNode2->create_client<text_to_speech_interfaces::srv::SetLanguage>("/TextToSpeechComponent/SetLanguage");
@@ -385,8 +385,8 @@ bool DialogComponent::start(int argc, char *argv[])
     isMotionDoneClientNode = rclcpp::Node::make_shared("DialogComponentMotionDoneNode");
     isMotionDoneClient = isMotionDoneClientNode->create_client<cartesian_pointing_interfaces::srv::IsMotionDone>("/CartesianPointingComponent/IsMotionDone");
 
-    schedulerEndTourClientNode = rclcpp::Node::make_shared("DialogComponentSchedulerEndTourNode");
-    schedulerEndTourClient = schedulerEndTourClientNode->create_client<scheduler_interfaces::srv::EndTour>("/SchedulerComponent/EndTour");
+    // schedulerEndTourClientNode = rclcpp::Node::make_shared("DialogComponentSchedulerEndTourNode");
+    // schedulerEndTourClient = schedulerEndTourClientNode->create_client<scheduler_interfaces::srv::EndTour>("/SchedulerComponent/EndTour");
 
     blackBoardResetClientNode = rclcpp::Node::make_shared("DialogComponentBlackBoardResetNode");
     blackBoardResetClient = blackBoardResetClientNode->create_client<blackboard_interfaces::srv::SetAllIntsWithPrefixBlackboard>("/BlackboardComponent/SetAllIntsWithPrefix");
@@ -488,12 +488,6 @@ bool DialogComponent::start(int argc, char *argv[])
         std::bind(&DialogComponent::handle_speak_accepted, this, std::placeholders::_1),
         action_options,
         action_cb_group_);
-
-    if (!UpdatePoILLMPrompt())
-    {
-        yError() << "[DialogComponent::ConfigureYarp] Error in UpdatePoILLMPrompt";
-        return false;
-    }
 
     RCLCPP_INFO(m_node->get_logger(), "Started node");
 
@@ -674,52 +668,6 @@ bool DialogComponent::CommandManager(const std::string &command, std::shared_ptr
     return true;
 }
 
-bool DialogComponent::UpdatePoILLMPrompt()
-{
-
-    auto requestGetCurrentPoi = std::make_shared<scheduler_interfaces::srv::GetCurrentPoi::Request>();
-    while (!clientGetCurrentPoi->wait_for_service(std::chrono::milliseconds(100)))
-    {
-        if (!rclcpp::ok())
-        {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service 'GetCurrentPoi'. Exiting.");
-        }
-    }
-    // send the request
-    auto resultGetCurrentPoi = clientGetCurrentPoi->async_send_request(requestGetCurrentPoi);
-    auto futureResultGetCurrentPoi = rclcpp::spin_until_future_complete(nodeGetCurrentPoi, resultGetCurrentPoi);
-    auto responseGetCurrentPoi = resultGetCurrentPoi.get();
-    yDebug() << "[DialogComponent::UpdatePoILLMPrompt] responseGetCurrentPoi" << responseGetCurrentPoi->poi_name << __LINE__;
-
-    if (futureResultGetCurrentPoi == rclcpp::FutureReturnCode::SUCCESS)
-    {
-        if (responseGetCurrentPoi->is_ok == true)
-        {
-            m_currentPoiName = responseGetCurrentPoi->poi_name;
-            // Set poi chat prompt
-            if (m_currentPoiName == "madama_start")
-            {
-                m_iPoiChat->setPrompt(m_startPrompt);
-            }
-            else
-            {
-                m_iPoiChat->setPrompt(m_poiPrompt);
-            }
-        }
-        else
-        {
-            RCLCPP_ERROR_STREAM(rclcpp::get_logger("rclcpp"), "Error in getting the current poi");
-            return false;
-        }
-    }
-    else
-    {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Error in getting the current poi");
-        return false;
-    }
-    return true;
-}
-
 void DialogComponent::SetLanguage(const std::shared_ptr<dialog_interfaces::srv::SetLanguage::Request> request,
                                   std::shared_ptr<dialog_interfaces::srv::SetLanguage::Response> response)
 {
@@ -739,30 +687,6 @@ void DialogComponent::SetLanguage(const std::shared_ptr<dialog_interfaces::srv::
     }
 
     yInfo() << "[DialogComponent::SetLanguage] Set Language Detected: " << newLang << __LINE__;
-    // Calls the set language service of the scheduler component
-    auto schedulerSetLangRequest = std::make_shared<scheduler_interfaces::srv::SetLanguage::Request>();
-    schedulerSetLangRequest->language = newLang;
-    while (!setLangClient->wait_for_service(std::chrono::milliseconds(100)))
-    {
-        if (!rclcpp::ok())
-        {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service 'Scheduler Component SetLanguage'. Exiting.");
-            response->is_ok = false;
-            return;
-        }
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Waiting for SchedulerComponent/SetLanguage Service");
-    }
-    auto result = setLangClient->async_send_request(schedulerSetLangRequest);
-    if (rclcpp::spin_until_future_complete(setLangClientNode, result) == rclcpp::FutureReturnCode::SUCCESS)
-    {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Set Language succeeded");
-    }
-    else
-    {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service set_language");
-        response->is_ok = false;
-        return;
-    }
 
     // Calls the set language service of the text to speech component
     auto request2 = std::make_shared<text_to_speech_interfaces::srv::SetLanguage::Request>();
@@ -1108,20 +1032,6 @@ void DialogComponent::WaitForInteraction(const std::shared_ptr<GoalHandleWaitFor
     auto feedback = std::make_shared<dialog_interfaces::action::WaitForInteraction::Feedback>();
     feedback->status = "Waiting for interaction";
     auto result = std::make_shared<dialog_interfaces::action::WaitForInteraction::Result>();
-    if (!UpdatePoILLMPrompt())
-    {
-        yError() << "[DialogComponent::CommandManager] Error in UpdatePoILLMPrompt";
-        result->is_ok = false;
-        goal_handle->abort(result);
-        return;
-    }
-
-    // if (goal->is_beginning_of_conversation)
-    // {
-    // m_replies.clear();
-    // m_last_received_interaction = "";
-    // yDebug() << "[DialogComponent::WaitForInteraction] Beginning of conversation detected, clearing replies" << __LINE__;
-    // }
 
     std::string questionText = "";
     float confidence = 0.0;
@@ -1670,56 +1580,6 @@ void DialogComponent::SetFaceExpression(std::string expressionName)
         request.fromString("emotion 1"); // happy
 
     m_faceexpression_rpc_port.write(request, reply);
-}
-
-void DialogComponent::ResetTourAndFlags()
-{
-
-    // Reset the tour in the SchedulerComponent
-    auto requestEndTour = std::make_shared<scheduler_interfaces::srv::EndTour::Request>();
-    while (!schedulerEndTourClient->wait_for_service(std::chrono::milliseconds(100)))
-    {
-        if (!rclcpp::ok())
-        {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service 'EndTour'. Exiting.");
-        }
-    }
-    auto resultEndTour = schedulerEndTourClient->async_send_request(requestEndTour);
-
-    if (rclcpp::spin_until_future_complete(schedulerEndTourClientNode, resultEndTour) == rclcpp::FutureReturnCode::SUCCESS)
-    {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "End Tour in SchedulerComponent succeeded");
-    }
-    else
-    {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service EndTour in SchedulerComponent");
-        return;
-    }
-
-    // Reset the tour in the BlackBoardComponent
-    auto requestSetAllIntsWithPrefix = std::make_shared<blackboard_interfaces::srv::SetAllIntsWithPrefixBlackboard::Request>();
-    requestSetAllIntsWithPrefix->field_name = "PoiDone";
-    requestSetAllIntsWithPrefix->value = 0;
-
-    while (!blackBoardResetClient->wait_for_service(std::chrono::milliseconds(100)))
-    {
-        if (!rclcpp::ok())
-        {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service 'SetAllIntsWithPrefix'. Exiting.");
-            return;
-        }
-    }
-    auto resultSetAllIntsWithPrefix = blackBoardResetClient->async_send_request(requestSetAllIntsWithPrefix);
-
-    if (rclcpp::spin_until_future_complete(blackBoardResetClientNode, resultSetAllIntsWithPrefix) == rclcpp::FutureReturnCode::SUCCESS)
-    {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Reset Tour in BlackboardComponent succeeded");
-    }
-    else
-    {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service SetAllIntsWithPrefix in BlackboardComponent");
-        return;
-    }
 }
 
 void DialogComponent::SetWebStatus(const std::shared_ptr<dialog_interfaces::srv::SetWebStatus::Request> request,
