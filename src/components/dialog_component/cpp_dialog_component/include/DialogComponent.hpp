@@ -235,12 +235,6 @@ private:
     std::string m_faceexpression_rpc_port_name;
     yarp::os::RpcClient m_faceexpression_rpc_port;
 
-    std::shared_ptr<rclcpp::Node> nodeGetCurrentPoi;
-    std::shared_ptr<rclcpp::Client<scheduler_interfaces::srv::GetCurrentPoi>> clientGetCurrentPoi;
-
-    std::shared_ptr<rclcpp::Node> setLangClientNode;
-    std::shared_ptr<rclcpp::Client<scheduler_interfaces::srv::SetLanguage>> setLangClient;
-
     std::shared_ptr<rclcpp::Node> setLangClientNode2;
     std::shared_ptr<rclcpp::Client<text_to_speech_interfaces::srv::SetLanguage>> setLangClient2;
 
@@ -264,9 +258,6 @@ private:
 
     std::shared_ptr<rclcpp::Node> isMotionDoneClientNode;
     std::shared_ptr<rclcpp::Client<cartesian_pointing_interfaces::srv::IsMotionDone>> isMotionDoneClient;
-
-    std::shared_ptr<rclcpp::Node> schedulerEndTourClientNode;
-    std::shared_ptr<rclcpp::Client<scheduler_interfaces::srv::EndTour>> schedulerEndTourClient;
 
     std::shared_ptr<rclcpp::Node> blackBoardResetClientNode;
     std::shared_ptr<rclcpp::Client<blackboard_interfaces::srv::SetAllIntsWithPrefixBlackboard>> blackBoardResetClient;
