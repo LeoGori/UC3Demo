@@ -63,6 +63,9 @@
 // ExecuteAudio Interfaces
 #include <execute_audio_interfaces/srv/execute_audio.hpp>
 
+// RAG LLM Interfaces
+#include <rag_interfaces/srv/get_context.hpp>
+
 #include "nlohmann/json.hpp"
 #include <random>
 #include <map>
@@ -133,6 +136,7 @@ protected:
     void SetFaceExpression(std::string expressionName); // ROS2 service client to FaceExpressionComponent to set the face expression with the given name
     void ExecuteAudio(std::string audioName); // forwards call to execute_audio_component
     void DisableMicrophone();
+    std::string GetContext(std::string question); // ROS2 service client to RAG LLM to get the context of the conversation, used for the follow-up questions in the PoIChat LLM
 
 private:
     // ChatGPT
@@ -261,6 +265,9 @@ private:
 
     std::shared_ptr<rclcpp::Node> setMicrophoneClientNode;
     std::shared_ptr<rclcpp::Client<text_to_speech_interfaces::srv::SetMicrophone>> setMicrophoneClient;
+
+    std::shared_ptr<rclcpp::Node> getContextClientNode;
+    std::shared_ptr<rclcpp::Client<rag_interfaces::srv::GetContext>> getContextClient;
 
     bool m_webStatus;
 
