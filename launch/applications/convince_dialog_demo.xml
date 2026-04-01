@@ -3,29 +3,15 @@
 
     <module>
         <name>yarprobotinterface</name>
-        <parameters>--context speechPipeline --from micAudio.ini --mic_sound_on_stop 0 --mic_start 1 --mic_min_samples 4000 --mic_max_samples 4000</parameters>
+        <parameters>--context speechPipeline --from micAudio.ini --mic_sound_on_stop 0 --mic_start 0 --mic_min_samples 4000 --mic_max_samples 4000</parameters>
         <node>r1-torso</node>
     </module>
 
     <module>
-        <name>python3</name>
-        <parameters>oww.py</parameters>
-        <workdir>$ENV{TOUR_GUIDE_ROBOT_SOURCE_DIR}/aux_modules/speechProcessing/openWakeWord</workdir>
-        <node>console-llm</node>
-    </module>
-
-    <module>
         <name>sileroVAD</name>
-        <parameters></parameters>
+        <parameters>--vad_threshold 0.6 --vad_gap_allowance 42</parameters>
         <environment>YARP_LOG_PROCESS_LABEL=VAD</environment>
         <node>console-llm</node>
-    </module>
-
-    <module>
-        <name>python3</name>
-        <parameters>play_notification.py</parameters>
-        <node>r1-face</node>
-        <workdir>$ENV{TOUR_GUIDE_ROBOT_SOURCE_DIR}/aux_modules/speechProcessing/wakeWordDetection</workdir>
     </module>
 
     <module>
@@ -36,44 +22,72 @@
 
     <module>
         <name>yarprobotinterface</name>
-        <parameters>--context convince --from madamaChat.ini</parameters>
+        <parameters>--context dialog_demo --from contextManagerChat.ini</parameters>
         <environment></environment>
         <node>console-llm</node>
     </module>
 
     <module>
         <name>yarprobotinterface</name>
-        <parameters>--context convince --from poiMadamaChat.ini </parameters>
+        <parameters>--context dialog_demo --from crisChat.ini </parameters>
         <environment></environment>
         <node>console-llm</node>
     </module>
 
     <module>
         <name>yarprobotinterface</name>
-        <parameters>--context convince --from welcomeTalkChat.ini </parameters>
+        <parameters>--context dialog_demo --from r1Chat.ini</parameters>
         <environment></environment>
         <node>console-llm</node>
     </module>
 
     <module>
         <name>yarprobotinterface</name>
-        <parameters>--context speechPipeline --from azureSynthesizer.ini</parameters>
+        <parameters>--context google --from googleSynthesizer.ini --synthesis_lang it-IT --synthesis_voice it-IT-Neural2-A</parameters>
         <environment></environment>
         <node>console-llm</node>
     </module>
 
     <module>
         <name>yarprobotinterface</name>
-        <parameters>--context speechPipeline --from azureTranscription.ini</parameters>
+        <parameters>--context google --from googleTranscription.ini --transcription_lang en-US</parameters>
         <environment></environment>
         <node>console-llm</node>
     </module>
 
     <module>
-        <name>ros2_scheduler_component</name>
-        <parameters>run scheduler_component scheduler_component conf/tours-with-italian-dates-in-chars.json TOUR_MADAMA_3</parameters>
-        <workdir>/home/user1/UC3</workdir>
+        <name>faceExpressionImage5GTour</name>
+        <parameters></parameters>
+        <workdir></workdir>
+        <node>r1-base</node>
+    </module>
+
+    <module>
+        <name>yarprobotinterface</name>
+        <parameters>--context headSynchronizer --from faceDisplay.ini</parameters>
+        <workdir></workdir>
+        <node>r1-face</node>
+    </module>
+
+    <module>
+        <name>yarpActionsPlayer</name>
+        <parameters>--filename configuration.ini --execute</parameters>
+        <workdir>/home/r1-user/UC3/conf/animations</workdir>
+        <node>r1-torso</node>
+    </module>
+
+    <module>
+        <name>yarpAudioPlayer</name>
+        <parameters></parameters>
+        <workdir>/home/user1/UC3/conf/</workdir>
         <node>bt</node>
+    </module>
+
+    <module>
+        <name>yarprobotinterface</name>
+        <parameters>--context headSynchronizer --from faceDisplay.ini</parameters>
+        <workdir></workdir>
+        <node>r1-face</node>
     </module>
 
     <module>
@@ -91,13 +105,6 @@
     </module>
 
     <module>
-        <name>yarpActionsPlayer</name>
-        <parameters> --filename configuration.ini --execute</parameters>
-        <workdir>/home/user1/UC3/conf/animations/</workdir>
-        <node>bt</node>
-    </module>
-
-    <module>
         <name>ros2_dance_component</name>
         <parameters>run dance_component dance_component movements.json</parameters>
         <workdir>/home/user1/UC3/conf/</workdir>
@@ -111,6 +118,18 @@
     </module>
 
     <module>
+        <name>ros2_execute_dance_component</name>
+        <parameters>run execute_dance_component execute_dance_component</parameters>
+        <node>bt</node>
+    </module>
+
+    <module>
+        <name>ros2_execute_audio_component</name>
+        <parameters>run execute_audio_component execute_audio_component</parameters>
+        <node>bt</node>
+    </module>
+
+    <module>
         <name>ros2_cartesian_pointing_component</name>
         <parameters>run cartesian_pointing_component cartesian_pointing_component --context r1_cartesian_control --artworks yarp-contexts/contexts/r1_cartesian_control/artwork_coords.json</parameters>
         <workdir>/home/user1/UC3/</workdir>
@@ -118,16 +137,16 @@
     </module>
 
     <module>
-        <name>ros2_cpp_dialog_component</name>
-        <parameters>run dialog_component dialog_component --from config.ini</parameters>
-        <workdir>/home/user1/UC3/src/components/dialog_component/cpp_dialog_component/config</workdir>
-        <node>bt</node>
+        <name>ros2</name>
+        <parameters>run rag_server rag_node --ros-args --params-file src/config/rag_node.yaml</parameters>
+        <workdir>/home/user1/rag_baseline/rag_ws</workdir>
+        <node>localhost</node>
     </module>
 
     <module>
-        <name>ros2_py_dialog_component</name>
-        <parameters>run py_interaction_cliserv service</parameters>
-        <workdir />
+        <name>ros2_cpp_dialog_component</name>
+        <parameters>run dialog_component dialog_component --from config.ini</parameters>
+        <workdir>/home/user1/UC3/src/components/dialog_component/cpp_dialog_component/config</workdir>
         <node>bt</node>
     </module>
     
@@ -139,59 +158,111 @@
     </module>
 
     <connection>
-        <from>/audioRecorder_nws/audio:o</from>
-        <to>/wake/audio:i</to>
-    </connection>
-
-    <connection>
-        <from>/wake/audio:o</from>
-        <to>/vad/audio:i</to>
-    </connection>
-
-    <connection>
-        <from>/vad/rpc:o</from>
-        <to>/wake/rpc:i</to>
-        <protocol>fast_tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/wake/notification:o</from>
-        <to>/wake_notification:i</to>
-        <protocol>fast_tcp</protocol>
-    </connection>
-    
-    <connection>
-        <from>/wake/face:o</from>
-        <to>/faceExpressionImage/rpc </to>
-        <protocol>fast_tcp</protocol>
-    </connection>
-
-    <connection>
         <from>/vad/audio:o</from>
         <to>/SpeechToTextComponent/audio:i</to>
+        <protocol>fast_tcp</protocol>
     </connection>
 
     <connection>
         <from>/SpeechToTextComponent/text:o</from>
         <to>/DialogComponent/SpeechToTextClient:i</to>
+        <protocol>fast_tcp</protocol>
     </connection>
 
     <connection>
         <from>/TextToSpeechComponent/batch:o</from>
         <to>/DialogComponent/batch:i</to>
+        <protocol>fast_tcp</protocol>
     </connection>
 
     <connection>
         <from>/DialogComponent/audio:o</from>
         <to>/audioPlayerWrapper/audio:i</to>
+        <protocol>fast_tcp+send.portmonitor+file.soundfilter_resample+type.dll+channel.0+frequency.16000</protocol>
     </connection>
 
     <connection>
         <from>/audioPlayerWrapper/status:o</from>
         <to>/TextToSpeechComponent/audioPlayerWrapper/status:i</to>
+        <protocol>fast_tcp</protocol>
     </connection>
 
-    
+    <connection>
+        <from>/audioRecorder_nws/audio:o</from>
+        <to>/vad/audio:i</to>
+        <protocol>fast_tcp+recv.portmonitor+file.soundfilter_resample+type.dll+channel.0+frequency.16000</protocol>
+    </connection>
 
+    <!-- <connection>
+        <from>/wake/audio:o</from>
+        <to>/vad/audio:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection> -->
+
+    <!-- <connection>
+        <from>/vad/rpc:o</from>
+        <to>/wake/rpc:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection> -->
+
+    <!-- <connection>
+        <from>/wake/notification:o</from>
+        <to>/wake_notification:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection> -->
+
+    <connection>
+        <from>/faceExpressionImage/image:o</from>
+        <to>/robot/faceDisplay/image:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/audioPlayerWrapper/status:o</from>
+        <to>/faceExpressionImage/mouthAudioData:i </to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/audioRecorder_nws/status:o</from>
+        <to>/faceExpressionImage/earsAudioStatus:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+
+    <!-- <connection>
+        <from>/wake/face:o</from>
+        <to>/faceExpressionImage/rpc </to>
+        <protocol>fast_tcp</protocol>
+    </connection> -->
+
+    <connection>
+        <from>/TextToSpeechComponent/audio:o</from>
+        <to>/audioPlayerWrapper/audio:i</to>
+        <protocol>fast_tcp+send.portmonitor+file.soundfilter_resample+type.dll+channel.0+frequency.16000</protocol>
+    </connection>
+
+    <connection>
+        <from>/DialogComponent/FaceExpressionClient/rpc:o</from>
+        <to>/faceExpressionImage/rpc</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/audioRecorder_nws/audio:o</from>
+        <to>/faceExpressionImage/earsAudioData:i</to>
+        <protocol>fast_tcp+recv.portmonitor+file.soundfilter_resample+type.dll+channel.0+frequency.16000</protocol>
+    </connection>
+
+    <connection>
+        <from>/audioRecorder_nws/status:o</from>
+        <to>/faceExpressionImage/earsAudioStatus:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/yarpAudioPlayer/audio:o</from>
+        <to>/audioPlayerWrapper/audio:i</to>
+        <protocol>fast_tcp+send.portmonitor+file.soundfilter_resample+type.dll+channel.0+frequency.16000</protocol>
+    </connection>
 
 </application>

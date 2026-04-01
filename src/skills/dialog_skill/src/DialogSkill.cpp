@@ -316,7 +316,7 @@ bool DialogSkill::start(int argc, char *argv[])
             if (futureResult == rclcpp::FutureReturnCode::SUCCESS)
             {
                 if( response->is_ok ==true) {
-                    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "DialogComponent.SetLanguage.Return second half done");
+                    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "DialogComponent.SetLanguage.Return done");
                 } else {
                     QVariantMap data;
                     data.insert("result", "FAILURE");
@@ -325,37 +325,6 @@ bool DialogSkill::start(int argc, char *argv[])
                 }
             }
         }
-
-        wait_succeded = true;
-        while (!pyDialogResetClient->wait_for_service(std::chrono::milliseconds(100))) {
-            if (!rclcpp::ok()) {
-                RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service 'ResetState'. Exiting.");
-                wait_succeded = false;
-                m_stateMachine.submitEvent("DialogComponent.ResetState.Return");
-            } 
-        }
-        if (wait_succeded) {
-            // send the request                                                                    
-            auto result = pyDialogResetClient->async_send_request(request);
-            auto futureResult = rclcpp::spin_until_future_complete(pyDialogResetClientNode, result);
-            auto response = result.get();
-            if (futureResult == rclcpp::FutureReturnCode::SUCCESS)
-            {
-                if( response->is_ok ==true) {
-                    QVariantMap data;
-                    data.insert("result", "SUCCESS");
-                    m_stateMachine.submitEvent("DialogComponent.ResetState.Return");
-                    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "DialogComponent.ResetState.Return second half done");
-                } else {
-                    QVariantMap data;
-                    data.insert("result", "FAILURE");
-                    m_stateMachine.submitEvent("DialogComponent.ResetState.Return", data);
-                    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "DialogComponent.ResetState.Return second half failed");
-                }
-            }
-        }
-
-    
     
     });
 
