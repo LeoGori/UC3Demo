@@ -1,5 +1,5 @@
 <application>
-    <name>convince_new_dialog_VAD_robot</name>
+    <name>dialog_gesture_cris_demo</name>
 
     <module>
         <name>yarprobotinterface</name>
@@ -118,29 +118,10 @@
     </module>
 
     <module>
-        <name>ros2_execute_dance_component</name>
-        <parameters>run execute_dance_component execute_dance_component</parameters>
-        <node>bt</node>
-    </module>
-
-    <module>
-        <name>ros2_execute_audio_component</name>
-        <parameters>run execute_audio_component execute_audio_component</parameters>
-        <node>bt</node>
-    </module>
-
-    <module>
         <name>ros2_cartesian_pointing_component</name>
         <parameters>run cartesian_pointing_component cartesian_pointing_component --context r1_cartesian_control --artworks yarp-contexts/contexts/r1_cartesian_control/artwork_coords.json</parameters>
         <workdir>/home/user1/UC3/</workdir>
         <node>bt</node>
-    </module>
-
-    <module>
-        <name>ros2</name>
-        <parameters>run rag_server rag_node --ros-args --params-file src/config/rag_node.yaml</parameters>
-        <workdir>/home/user1/rag_baseline/rag_ws</workdir>
-        <node>localhost</node>
     </module>
 
     <module>
@@ -157,47 +138,22 @@
         <node>bt</node>
     </module>
 
-    <connection>
-        <from>/vad/audio:o</from>
-        <to>/SpeechToTextComponent/audio:i</to>
-        <protocol>fast_tcp</protocol>
-    </connection>
+    <module>
+        <name>ros2</name>
+        <parameters>run rag_server rag_node --ros-args --params-file src/config/rag_node.yaml</parameters>
+        <workdir>/home/user1/rag_baseline/rag_ws</workdir>
+        <node>bt-host</node>
+    </module>
 
-    <connection>
-        <from>/SpeechToTextComponent/text:o</from>
-        <to>/DialogComponent/SpeechToTextClient:i</to>
-        <protocol>fast_tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/TextToSpeechComponent/batch:o</from>
-        <to>/DialogComponent/batch:i</to>
-        <protocol>fast_tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/DialogComponent/audio:o</from>
-        <to>/audioPlayerWrapper/audio:i</to>
-        <protocol>fast_tcp+send.portmonitor+file.soundfilter_resample+type.dll+channel.0+frequency.16000</protocol>
-    </connection>
-
-    <connection>
-        <from>/audioPlayerWrapper/status:o</from>
-        <to>/TextToSpeechComponent/audioPlayerWrapper/status:i</to>
-        <protocol>fast_tcp</protocol>
-    </connection>
+    <!-- <connection>
+        <from>/audioRecorder_nws/audio:o</from>
+        <to>/wake/audio:i</to>
+    </connection> -->
 
     <connection>
         <from>/audioRecorder_nws/audio:o</from>
         <to>/vad/audio:i</to>
-        <protocol>fast_tcp+recv.portmonitor+file.soundfilter_resample+type.dll+channel.0+frequency.16000</protocol>
     </connection>
-
-    <!-- <connection>
-        <from>/wake/audio:o</from>
-        <to>/vad/audio:i</to>
-        <protocol>fast_tcp</protocol>
-    </connection> -->
 
     <!-- <connection>
         <from>/vad/rpc:o</from>
@@ -210,25 +166,7 @@
         <to>/wake_notification:i</to>
         <protocol>fast_tcp</protocol>
     </connection> -->
-
-    <connection>
-        <from>/faceExpressionImage/image:o</from>
-        <to>/robot/faceDisplay/image:i</to>
-        <protocol>fast_tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/audioPlayerWrapper/status:o</from>
-        <to>/faceExpressionImage/mouthAudioData:i </to>
-        <protocol>fast_tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/audioRecorder_nws/status:o</from>
-        <to>/faceExpressionImage/earsAudioStatus:i</to>
-        <protocol>fast_tcp</protocol>
-    </connection>
-
+    
     <!-- <connection>
         <from>/wake/face:o</from>
         <to>/faceExpressionImage/rpc </to>
@@ -236,33 +174,58 @@
     </connection> -->
 
     <connection>
-        <from>/TextToSpeechComponent/audio:o</from>
+        <from>/vad/audio:o</from>
+        <to>/SpeechToTextComponent/audio:i</to>
+    </connection>
+
+    <connection>
+        <from>/SpeechToTextComponent/text:o</from>
+        <to>/DialogComponent/SpeechToTextClient:i</to>
+    </connection>
+
+    <connection>
+        <from>/TextToSpeechComponent/batch:o</from>
+        <to>/DialogComponent/batch:i</to>
+    </connection>
+
+    <connection>
+        <from>/DialogComponent/audio:o</from>
         <to>/audioPlayerWrapper/audio:i</to>
-        <protocol>fast_tcp+send.portmonitor+file.soundfilter_resample+type.dll+channel.0+frequency.16000</protocol>
     </connection>
 
     <connection>
-        <from>/DialogComponent/FaceExpressionClient/rpc:o</from>
-        <to>/faceExpressionImage/rpc</to>
-        <protocol>fast_tcp</protocol>
+        <from>/audioPlayerWrapper/status:o</from>
+        <to>/TextToSpeechComponent/audioPlayerWrapper/status:i</to>
     </connection>
 
     <connection>
-        <from>/audioRecorder_nws/audio:o</from>
-        <to>/faceExpressionImage/earsAudioData:i</to>
-        <protocol>fast_tcp+recv.portmonitor+file.soundfilter_resample+type.dll+channel.0+frequency.16000</protocol>
-    </connection>
+    <from>/faceExpressionImage/image:o</from>
+    <to>/robot/faceDisplay/image:i</to>
+    <protocol>fast_tcp</protocol>
+  </connection>
 
-    <connection>
-        <from>/audioRecorder_nws/status:o</from>
-        <to>/faceExpressionImage/earsAudioStatus:i</to>
-        <protocol>fast_tcp</protocol>
-    </connection>
+  <connection>
+    <from>/audioPlayerWrapper/status:o</from>
+    <to>/faceExpressionImage/mouthAudioData:i </to>
+    <protocol>fast_tcp</protocol>
+  </connection>
 
-    <connection>
-        <from>/yarpAudioPlayer/audio:o</from>
-        <to>/audioPlayerWrapper/audio:i</to>
-        <protocol>fast_tcp+send.portmonitor+file.soundfilter_resample+type.dll+channel.0+frequency.16000</protocol>
-    </connection>
+  <connection>
+    <from>/audioRecorder_nws/status:o</from>
+    <to>/faceExpressionImage/earsAudioStatus:i</to>
+    <protocol>fast_tcp</protocol>
+  </connection>
+
+  <connection>
+    <from>/DialogComponent/FaceExpressionClient/rpc:o</from>
+    <to>/faceExpressionImage/rpc</to>
+    <protocol>fast_tcp</protocol>
+  </connection>
+
+  <connection>
+    <from>/audioRecorder_nws/audio:o</from>
+    <to>/faceExpressionImage/earsAudioData:i</to>
+    <protocol>fast_tcp+recv.portmonitor+file.soundfilter_resample+type.dll+channel.0+frequency.16000</protocol>
+  </connection>
 
 </application>

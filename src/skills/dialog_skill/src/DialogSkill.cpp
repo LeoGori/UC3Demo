@@ -317,6 +317,10 @@ bool DialogSkill::start(int argc, char *argv[])
             {
                 if( response->is_ok ==true) {
                     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "DialogComponent.SetLanguage.Return done");
+                    QVariantMap data;
+                    data.insert("result", "SUCCESS");
+                    m_stateMachine.submitEvent("DialogComponent.ResetState.Return", data);
+
                 } else {
                     QVariantMap data;
                     data.insert("result", "FAILURE");
